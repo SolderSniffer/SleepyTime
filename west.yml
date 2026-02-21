@@ -1,0 +1,30 @@
+# SleepyTime — West application manifest
+#
+# This manifest declares the application workspace. Since the nRF Connect SDK
+# is baked into the dev container image at /opt/ncs, west is already
+# initialised there. This file exists so west can locate the application
+# source when running `west build` from the repo root.
+#
+# When bumping NCS, update the revision here to match ARG NCS_VERSION in
+# the Dockerfile, then rebuild the dev container image.
+
+manifest:
+  version: "0.13"
+
+  remotes:
+    - name: nrfconnect
+      url-base: https://github.com/nrfconnect
+
+  projects:
+    - name: nrf
+      remote: nrfconnect
+      repo-path: sdk-nrf
+      revision: v3.2.1
+      import:
+        # Import the full NCS west.yml so all modules (zephyr, mcuboot, etc.)
+        # are available. The container image already has these fetched;
+        # this declaration lets west resolve paths correctly.
+        file: west.yml
+
+  self:
+    path: sleepytime
