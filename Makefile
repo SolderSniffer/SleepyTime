@@ -181,6 +181,7 @@ test:
 	    -B $(BUILD_TEST) \
 	    -G Ninja \
 	    -DUNITY_DIR=/opt/unity \
+	    -DSLEEPYTIME_ROOT=$(CURDIR) \
 	    -DCMAKE_BUILD_TYPE=Debug
 	ninja -C $(BUILD_TEST)
 	@echo "$(CYAN)Running tests…$(RESET)"
