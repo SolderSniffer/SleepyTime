@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Flashes via `make flash` then halts at main.
+      // Use `hbreak file.c:line` in the DEBUG CONSOLE to set breakpoints —
+      // gutter clicks send software breakpoints which the nRF54L15 SPU blocks.
+      "name": "Flash and Debug (OpenOCD)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "openocd",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/debug/app/zephyr/zephyr.elf",
+      "configFiles": [
+        "/workspace/app/support/openocd-debug.cfg"
+      ],
+      "searchDir": [
+        "/opt/ncs/zephyr/boards/seeed/xiao_nrf54l15/support",
+        "/opt/zephyr-sdk/sysroots/x86_64-pokysdk-linux/usr/share/openocd/scripts"
+      ],
+      "svdFile": "/opt/ncs/modules/hal/nordic/nrfx/bsp/stable/mdk/nrf54l15_application.svd",
+      "showDevDebugOutput": "none",
+      "gdbPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb",
+      "preLaunchTask": "flash",
+      "overrideLaunchCommands": [
+        "set mem inaccessible-by-default off",
+        "monitor reset halt",
+        "monitor wait_halt 5000",
+        "hbreak main"
+      ]
+    }
+  ]
+}
