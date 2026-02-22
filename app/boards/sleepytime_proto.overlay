@@ -1,0 +1,86 @@
+/*
+ * SleepyTime — hardware overlay for prototype (discrete modules)
+ *
+ * Extends the upstream XIAO nRF54L15 board DTS with SleepyTime-specific
+ * peripherals.
+ *
+ * nRF54L15 I2C peripheral naming:
+ *   i2c20, i2c21, i2c22 — PERI power domain (recommended, P1 pins)
+ *   i2c30               — LP power domain (P0 pins)
+ *   There is no i2c0 or i2c1 on this SoC.
+ *
+ * TODO before first flash:
+ *   1. Confirm SDA/SCL pin numbers against prototype wiring diagram.
+ *      Replace TWIM_SDA/TWIM_SCL port/pin values below.
+ *   2. Confirm INT1 GPIO port/pin (currently P1.10).
+ *   3. Confirm I2C address (0x18 = SA0 low, 0x19 = SA0 high).
+ *   4. If SDA/SCL are on P0 pins (LP domain), change &i2c20 → &i2c30
+ *      and update pinctrl labels accordingly.
+ */
+
+#include <zephyr/dt-bindings/sensor/lis2dh.h>
+
+&pinctrl {
+    /* Use i2c30 labels */
+    i2c30_default: i2c30_default {
+        group1 {
+            /* Note: Ensure these pins (1,2 and 1,3) are valid for cluster 30 
+               If they are P1 pins, you may need to check the XIAO pinout 
+               to find available P0 pins for the LP domain. */
+            psels = <NRF_PSEL(TWIM_SDA, 1, 2)>,
+                    <NRF_PSEL(TWIM_SCL, 1, 3)>;
+        };
+    };
+
+    i2c30_sleep: i2c30_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 1, 2)>,
+                    <NRF_PSEL(TWIM_SCL, 1, 3)>;
+            low-power-enable;
+        };
+    };
+};
+
+&i2c30 {
+    compatible = "nordic,nrf-twim";
+    status = "okay";
+    pinctrl-0 = <&i2c30_default>;
+    pinctrl-1 = <&i2c30_sleep>;
+    pinctrl-names = "default", "sleep";
+    clock-frequency = <I2C_BITRATE_FAST>;
+
+    lis3dh: lis3dh@18 {
+        compatible = "st,lis2dh";
+        /*
+         * 0x18 = SA0 pulled low (default on most breakout boards).
+         * Change to 0x19 if SA0 is pulled high on your module.
+         */
+        reg = <0x18>;
+        status = "okay";
+
+        /*
+         * INT1 GPIO. The lis2dh driver owns this pin — do not also
+         * define it in a gpio-keys or aliases node.
+         * TODO: confirm P1.10 against prototype wiring diagram.
+         */
+        irq-gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+
+        /*
+         * Level-sensitive active-high — required for nRF54L15 GPIO sense
+         * wakeup from System Off. The INT1 line must stay asserted after
+         * the gesture so the sense latch fires before deep sleep completes.
+         */
+        int1-gpio-config = <LIS2DH_DT_GPIO_INT_LEVEL_HIGH>;
+
+        /*
+         * Fire on any axis exceeding threshold (OR combination).
+         * Appropriate for wrist-raise detection regardless of watch
+         * orientation on the wrist.
+         */
+        anym-mode = <LIS2DH_DT_ANYM_OR_COMBINATION>;
+    };
+};
+
+&gpio1 {
+    status = "okay";
+};
