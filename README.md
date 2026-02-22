@@ -73,3 +73,7 @@ TODO: Add a `make rtt` target that runs both commands in tmux or implement somet
 make lint             # format-check + clang-tidy (CI gate)
 make format           # auto-format sources in-place
 ```
+
+Formatting is standardised across CLI and editor:
+- `make format` / `make lint` use project `.clang-format`
+- VS Code right-click **Format Document** also uses `.clang-format` via workspace settings in `.vscode/settings.json`
