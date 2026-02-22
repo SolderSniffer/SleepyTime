@@ -126,8 +126,7 @@ static const uint8_t font5x7[][5] = {
 /* ── Internal helpers ───────────────────────────────────────────────────────
  */
 
-static void set_pixel_raw(epd_canvas_t *canvas, uint16_t x, uint16_t y,
-                          uint8_t colour) {
+static void set_pixel_raw(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint8_t colour) {
   /* Caller guarantees in-bounds. */
   uint32_t byte_idx = (uint32_t)y * EPD_FB_STRIDE + (x / 8U);
   uint8_t bit_mask = (uint8_t)(0x80U >> (x % 8U));
@@ -139,8 +138,7 @@ static void set_pixel_raw(epd_canvas_t *canvas, uint16_t x, uint16_t y,
   }
 }
 
-static uint8_t get_pixel_raw(const epd_canvas_t *canvas, uint16_t x,
-                             uint16_t y) {
+static uint8_t get_pixel_raw(const epd_canvas_t *canvas, uint16_t x, uint16_t y) {
   uint32_t byte_idx = (uint32_t)y * EPD_FB_STRIDE + (x / 8U);
   uint8_t bit_mask = (uint8_t)(0x80U >> (x % 8U));
   return (canvas->fb[byte_idx] & bit_mask) ? EPD_WHITE : EPD_BLACK;
@@ -176,8 +174,7 @@ const uint8_t *epd_canvas_fb(const epd_canvas_t *canvas) {
 /* ── Pixel primitives ───────────────────────────────────────────────────────
  */
 
-void epd_canvas_set_pixel(epd_canvas_t *canvas, uint16_t x, uint16_t y,
-                          uint8_t colour) {
+void epd_canvas_set_pixel(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint8_t colour) {
   if (canvas == NULL) {
     return;
   }
@@ -187,8 +184,7 @@ void epd_canvas_set_pixel(epd_canvas_t *canvas, uint16_t x, uint16_t y,
   set_pixel_raw(canvas, x, y, colour);
 }
 
-uint8_t epd_canvas_get_pixel(const epd_canvas_t *canvas, uint16_t x,
-                             uint16_t y) {
+uint8_t epd_canvas_get_pixel(const epd_canvas_t *canvas, uint16_t x, uint16_t y) {
   if (canvas == NULL) {
     return EPD_WHITE;
   }
@@ -201,8 +197,7 @@ uint8_t epd_canvas_get_pixel(const epd_canvas_t *canvas, uint16_t x,
 /* ── Shape primitives ───────────────────────────────────────────────────────
  */
 
-void epd_canvas_hline(epd_canvas_t *canvas, uint16_t x0, uint16_t x1,
-                      uint16_t y, uint8_t colour) {
+void epd_canvas_hline(epd_canvas_t *canvas, uint16_t x0, uint16_t x1, uint16_t y, uint8_t colour) {
   if (canvas == NULL) {
     return;
   }
@@ -222,8 +217,7 @@ void epd_canvas_hline(epd_canvas_t *canvas, uint16_t x0, uint16_t x1,
   }
 }
 
-void epd_canvas_vline(epd_canvas_t *canvas, uint16_t x, uint16_t y0,
-                      uint16_t y1, uint8_t colour) {
+void epd_canvas_vline(epd_canvas_t *canvas, uint16_t x, uint16_t y0, uint16_t y1, uint8_t colour) {
   if (canvas == NULL) {
     return;
   }
@@ -243,8 +237,8 @@ void epd_canvas_vline(epd_canvas_t *canvas, uint16_t x, uint16_t y0,
   }
 }
 
-void epd_canvas_fill_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y,
-                          uint16_t w, uint16_t h, uint8_t colour) {
+void epd_canvas_fill_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                          uint8_t colour) {
   if (canvas == NULL || w == 0 || h == 0) {
     return;
   }
@@ -265,17 +259,15 @@ void epd_canvas_fill_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y,
   }
 }
 
-void epd_canvas_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint16_t w,
-                     uint16_t h, uint8_t colour) {
+void epd_canvas_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                     uint8_t colour) {
   if (canvas == NULL || w == 0 || h == 0) {
     return;
   }
   epd_canvas_hline(canvas, x, (uint16_t)(x + w - 1U), y, colour);
-  epd_canvas_hline(canvas, x, (uint16_t)(x + w - 1U), (uint16_t)(y + h - 1U),
-                   colour);
+  epd_canvas_hline(canvas, x, (uint16_t)(x + w - 1U), (uint16_t)(y + h - 1U), colour);
   epd_canvas_vline(canvas, x, y, (uint16_t)(y + h - 1U), colour);
-  epd_canvas_vline(canvas, (uint16_t)(x + w - 1U), y, (uint16_t)(y + h - 1U),
-                   colour);
+  epd_canvas_vline(canvas, (uint16_t)(x + w - 1U), y, (uint16_t)(y + h - 1U), colour);
 }
 
 /* ── Font / text ────────────────────────────────────────────────────────────
@@ -304,9 +296,8 @@ uint16_t epd_canvas_text_width(const char *str, epd_font_scale_t scale) {
   return (uint16_t)(((uint32_t)len * (FONT_BASE_W + 1U) - 1U) * scale);
 }
 
-void epd_canvas_text(epd_canvas_t *canvas, uint16_t x, uint16_t y,
-                     const char *str, epd_font_scale_t scale, uint8_t fg,
-                     uint8_t bg) {
+void epd_canvas_text(epd_canvas_t *canvas, uint16_t x, uint16_t y, const char *str,
+                     epd_font_scale_t scale, uint8_t fg, uint8_t bg) {
   if (canvas == NULL || str == NULL || scale == 0) {
     return;
   }
@@ -341,8 +332,8 @@ void epd_canvas_text(epd_canvas_t *canvas, uint16_t x, uint16_t y,
 /* ── Watch face layouts ─────────────────────────────────────────────────────
  */
 
-void epd_canvas_draw_watch_face(epd_canvas_t *canvas, const char *time_str,
-                                const char *date_str, uint8_t battery_pct) {
+void epd_canvas_draw_watch_face(epd_canvas_t *canvas, const char *time_str, const char *date_str,
+                                uint8_t battery_pct) {
   if (canvas == NULL) {
     return;
   }
@@ -352,8 +343,7 @@ void epd_canvas_draw_watch_face(epd_canvas_t *canvas, const char *time_str,
   /* ── Time — large, vertically centred slightly above mid ── */
   uint16_t tw = epd_canvas_text_width(time_str, EPD_FONT_LARGE);
   uint16_t tx = (EPD_WIDTH_PX > tw) ? (EPD_WIDTH_PX - tw) / 2U : 0U;
-  epd_canvas_text(canvas, tx, 72U, time_str, EPD_FONT_LARGE, EPD_BLACK,
-                  EPD_WHITE);
+  epd_canvas_text(canvas, tx, 72U, time_str, EPD_FONT_LARGE, EPD_BLACK, EPD_WHITE);
 
   /* ── Divider line under time ── */
   epd_canvas_hline(canvas, 20U, 179U, 100U, EPD_BLACK);
@@ -361,8 +351,7 @@ void epd_canvas_draw_watch_face(epd_canvas_t *canvas, const char *time_str,
   /* ── Date — medium, below divider ── */
   uint16_t dw = epd_canvas_text_width(date_str, EPD_FONT_MEDIUM);
   uint16_t dx = (EPD_WIDTH_PX > dw) ? (EPD_WIDTH_PX - dw) / 2U : 0U;
-  epd_canvas_text(canvas, dx, 110U, date_str, EPD_FONT_MEDIUM, EPD_BLACK,
-                  EPD_WHITE);
+  epd_canvas_text(canvas, dx, 110U, date_str, EPD_FONT_MEDIUM, EPD_BLACK, EPD_WHITE);
 
   /* ── Battery percentage — small, bottom-right ── */
   char bat_str[8];
@@ -370,8 +359,7 @@ void epd_canvas_draw_watch_face(epd_canvas_t *canvas, const char *time_str,
   snprintf(bat_str, sizeof(bat_str), "%u%%", pct);
   uint16_t bw = epd_canvas_text_width(bat_str, EPD_FONT_SMALL);
   uint16_t bx = (EPD_WIDTH_PX > bw + 4U) ? (EPD_WIDTH_PX - bw - 4U) : 0U;
-  epd_canvas_text(canvas, bx, 188U, bat_str, EPD_FONT_SMALL, EPD_BLACK,
-                  EPD_WHITE);
+  epd_canvas_text(canvas, bx, 188U, bat_str, EPD_FONT_SMALL, EPD_BLACK, EPD_WHITE);
 }
 
 void epd_canvas_draw_sync_screen(epd_canvas_t *canvas) {
@@ -419,6 +407,5 @@ void epd_canvas_draw_low_battery(epd_canvas_t *canvas, uint8_t battery_pct) {
   snprintf(pct_str, sizeof(pct_str), "%u%%", pct);
   uint16_t pw = epd_canvas_text_width(pct_str, EPD_FONT_SMALL);
   uint16_t px = (EPD_WIDTH_PX > pw) ? (EPD_WIDTH_PX - pw) / 2U : 0U;
-  epd_canvas_text(canvas, px, 148U, pct_str, EPD_FONT_SMALL, EPD_BLACK,
-                  EPD_WHITE);
+  epd_canvas_text(canvas, px, 148U, pct_str, EPD_FONT_SMALL, EPD_BLACK, EPD_WHITE);
 }

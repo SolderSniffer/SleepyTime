@@ -20,8 +20,7 @@ static bool is_leap_year(uint16_t year) {
 }
 
 static uint8_t days_in_month(uint8_t month, uint16_t year) {
-  static const uint8_t dom[13] = {0,  31, 28, 31, 30, 31, 30,
-                                  31, 31, 30, 31, 30, 31};
+  static const uint8_t dom[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   if (month == 2 && is_leap_year(year)) {
     return 29;
   }
@@ -145,8 +144,7 @@ bool watch_time_is_after(const watch_time_t *a, const watch_time_t *b) {
   return to_epoch_seconds(a) > to_epoch_seconds(b);
 }
 
-watch_sync_result_t watch_time_apply_sync(watch_time_t *current,
-                                          const watch_time_t *incoming) {
+watch_sync_result_t watch_time_apply_sync(watch_time_t *current, const watch_time_t *incoming) {
   if (current == NULL || incoming == NULL) {
     return WATCH_SYNC_INVALID;
   }
@@ -195,8 +193,7 @@ void watch_time_compute_weekday(watch_time_t *t) {
 }
 
 const char *watch_time_weekday_abbr(uint8_t weekday) {
-  static const char *abbr[7] = {"Sun", "Mon", "Tue", "Wed",
-                                "Thu", "Fri", "Sat"};
+  static const char *abbr[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
   if (weekday > 6) {
     return "???";
   }
@@ -204,9 +201,8 @@ const char *watch_time_weekday_abbr(uint8_t weekday) {
 }
 
 const char *watch_time_month_abbr(uint8_t month) {
-  static const char *abbr[13] = {"???", "Jan", "Feb", "Mar", "Apr",
-                                 "May", "Jun", "Jul", "Aug", "Sep",
-                                 "Oct", "Nov", "Dec"};
+  static const char *abbr[13] = {"???", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
   if (month < 1 || month > 12) {
     return abbr[0];
   }
@@ -241,8 +237,7 @@ void watch_time_fmt_date(const watch_time_t *t, char *buf, uint8_t len) {
 /* ── Alarm ──────────────────────────────────────────────────────────────────
  */
 
-bool watch_alarm_should_fire(const watch_alarm_t *alarm,
-                             const watch_time_t *t) {
+bool watch_alarm_should_fire(const watch_alarm_t *alarm, const watch_time_t *t) {
   if (alarm == NULL || t == NULL) {
     return false;
   }
@@ -255,12 +250,10 @@ bool watch_alarm_should_fire(const watch_alarm_t *alarm,
   if (!(alarm->dow_mask & (1U << t->weekday))) {
     return false;
   }
-  return (alarm->hour == t->hour) && (alarm->minute == t->minute) &&
-         (t->second == 0);
+  return (alarm->hour == t->hour) && (alarm->minute == t->minute) && (t->second == 0);
 }
 
-uint32_t watch_alarm_seconds_until(const watch_alarm_t *alarm,
-                                   const watch_time_t *now) {
+uint32_t watch_alarm_seconds_until(const watch_alarm_t *alarm, const watch_time_t *now) {
   if (alarm == NULL || now == NULL) {
     return UINT32_MAX;
   }
@@ -269,10 +262,9 @@ uint32_t watch_alarm_seconds_until(const watch_alarm_t *alarm,
   }
 
   /* Current time as seconds-since-midnight */
-  uint32_t now_secs = (uint32_t)now->hour * 3600U +
-                      (uint32_t)now->minute * 60U + (uint32_t)now->second;
-  uint32_t alarm_secs =
-      (uint32_t)alarm->hour * 3600U + (uint32_t)alarm->minute * 60U;
+  uint32_t now_secs =
+      (uint32_t)now->hour * 3600U + (uint32_t)now->minute * 60U + (uint32_t)now->second;
+  uint32_t alarm_secs = (uint32_t)alarm->hour * 3600U + (uint32_t)alarm->minute * 60U;
 
   /* Search forward up to 7 days (inclusive) to handle "already passed today" */
   for (uint8_t days_ahead = 0; days_ahead <= 7; days_ahead++) {

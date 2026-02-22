@@ -80,14 +80,12 @@ const uint8_t *epd_canvas_fb(const epd_canvas_t *canvas);
 /**
  * @brief Set a single pixel. Silently clips out-of-bounds coordinates.
  */
-void epd_canvas_set_pixel(epd_canvas_t *canvas, uint16_t x, uint16_t y,
-                          uint8_t colour);
+void epd_canvas_set_pixel(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint8_t colour);
 
 /**
  * @brief Read a single pixel. Returns EPD_WHITE for out-of-bounds.
  */
-uint8_t epd_canvas_get_pixel(const epd_canvas_t *canvas, uint16_t x,
-                             uint16_t y);
+uint8_t epd_canvas_get_pixel(const epd_canvas_t *canvas, uint16_t x, uint16_t y);
 
 /* ── Shape primitives ───────────────────────────────────────────────────────
  */
@@ -95,26 +93,24 @@ uint8_t epd_canvas_get_pixel(const epd_canvas_t *canvas, uint16_t x,
 /**
  * @brief Draw a horizontal line from (x0, y) to (x1, y).
  */
-void epd_canvas_hline(epd_canvas_t *canvas, uint16_t x0, uint16_t x1,
-                      uint16_t y, uint8_t colour);
+void epd_canvas_hline(epd_canvas_t *canvas, uint16_t x0, uint16_t x1, uint16_t y, uint8_t colour);
 
 /**
  * @brief Draw a vertical line from (x, y0) to (x, y1).
  */
-void epd_canvas_vline(epd_canvas_t *canvas, uint16_t x, uint16_t y0,
-                      uint16_t y1, uint8_t colour);
+void epd_canvas_vline(epd_canvas_t *canvas, uint16_t x, uint16_t y0, uint16_t y1, uint8_t colour);
 
 /**
  * @brief Draw a filled rectangle.
  */
-void epd_canvas_fill_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y,
-                          uint16_t w, uint16_t h, uint8_t colour);
+void epd_canvas_fill_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                          uint8_t colour);
 
 /**
  * @brief Draw an unfilled rectangle (1 px border).
  */
-void epd_canvas_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint16_t w,
-                     uint16_t h, uint8_t colour);
+void epd_canvas_rect(epd_canvas_t *canvas, uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                     uint8_t colour);
 
 /* ── Font / text ────────────────────────────────────────────────────────────
  */
@@ -147,9 +143,8 @@ uint16_t epd_canvas_text_width(const char *str, epd_font_scale_t scale);
  * @param fg  Foreground (glyph) colour.
  * @param bg  Background colour (fills glyph bounding box).
  */
-void epd_canvas_text(epd_canvas_t *canvas, uint16_t x, uint16_t y,
-                     const char *str, epd_font_scale_t scale, uint8_t fg,
-                     uint8_t bg);
+void epd_canvas_text(epd_canvas_t *canvas, uint16_t x, uint16_t y, const char *str,
+                     epd_font_scale_t scale, uint8_t fg, uint8_t bg);
 
 /* ── Watch face layouts ─────────────────────────────────────────────────────
  */
@@ -166,8 +161,8 @@ void epd_canvas_text(epd_canvas_t *canvas, uint16_t x, uint16_t y,
  * @param date_str   Null-terminated "Www DD Mmm" string.
  * @param battery_pct  0–100. Values > 100 are clamped.
  */
-void epd_canvas_draw_watch_face(epd_canvas_t *canvas, const char *time_str,
-                                const char *date_str, uint8_t battery_pct);
+void epd_canvas_draw_watch_face(epd_canvas_t *canvas, const char *time_str, const char *date_str,
+                                uint8_t battery_pct);
 
 /**
  * @brief Render a minimal "pairing / BLE sync" screen.

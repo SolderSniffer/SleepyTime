@@ -87,8 +87,7 @@ bool watch_time_is_after(const watch_time_t *a, const watch_time_t *b);
  * @param incoming  Candidate time from BLE / RTC read.
  * @return          Sync result code.
  */
-watch_sync_result_t watch_time_apply_sync(watch_time_t *current,
-                                          const watch_time_t *incoming);
+watch_sync_result_t watch_time_apply_sync(watch_time_t *current, const watch_time_t *incoming);
 
 /** Maximum seconds the incoming sync time may lag current before rejection. */
 #define WATCH_TIME_MAX_BACKWARDS_JUMP_S (60U)
@@ -146,8 +145,7 @@ bool watch_alarm_should_fire(const watch_alarm_t *alarm, const watch_time_t *t);
  * @brief Compute seconds until @p alarm next fires relative to @p now.
  *        Returns UINT32_MAX if alarm is disabled or dow_mask is zero.
  */
-uint32_t watch_alarm_seconds_until(const watch_alarm_t *alarm,
-                                   const watch_time_t *now);
+uint32_t watch_alarm_seconds_until(const watch_alarm_t *alarm, const watch_time_t *now);
 
 #ifdef __cplusplus
 }

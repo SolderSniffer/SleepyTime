@@ -30,15 +30,14 @@ extern "C" {
  */
 
 typedef enum {
-  WATCH_STATE_BOOTING =
-      0, /**< Entry state: decode RESETREAS, load boot state */
+  WATCH_STATE_BOOTING = 0,    /**< Entry state: decode RESETREAS, load boot state */
   WATCH_STATE_DISPLAY_UPDATE, /**< Render current time to EPD */
-  WATCH_STATE_ACTIVE,   /**< Display is current; waiting for next event   */
-  WATCH_STATE_BLE_SYNC, /**< BLE connection open, waiting for CTS write   */
-  WATCH_STATE_SLEEP_PENDING, /**< EPD refresh complete; prepare for System Off
-                              */
-  WATCH_STATE_SLEEPING,    /**< Terminal: System Off entry called             */
-  WATCH_STATE_LOW_BATTERY, /**< Battery too low for normal operation          */
+  WATCH_STATE_ACTIVE,         /**< Display is current; waiting for next event   */
+  WATCH_STATE_BLE_SYNC,       /**< BLE connection open, waiting for CTS write   */
+  WATCH_STATE_SLEEP_PENDING,  /**< EPD refresh complete; prepare for System Off
+                               */
+  WATCH_STATE_SLEEPING,       /**< Terminal: System Off entry called             */
+  WATCH_STATE_LOW_BATTERY,    /**< Battery too low for normal operation          */
 
   WATCH_STATE_COUNT,
 } watch_state_t;
@@ -47,17 +46,17 @@ typedef enum {
  */
 
 typedef enum {
-  WATCH_EVT_BOOT_DONE = 0, /**< Boot state loaded, init complete              */
-  WATCH_EVT_DISPLAY_READY, /**< EPD refresh complete (BUSY line deasserted) */
-  WATCH_EVT_WRIST_RAISED,  /**< LIS3DH activity interrupt fired               */
-  WATCH_EVT_WRIST_LOWERED, /**< Inactivity timeout elapsed                    */
-  WATCH_EVT_BLE_CONNECTED, /**< BLE link established                          */
+  WATCH_EVT_BOOT_DONE = 0,    /**< Boot state loaded, init complete              */
+  WATCH_EVT_DISPLAY_READY,    /**< EPD refresh complete (BUSY line deasserted) */
+  WATCH_EVT_WRIST_RAISED,     /**< LIS3DH activity interrupt fired               */
+  WATCH_EVT_WRIST_LOWERED,    /**< Inactivity timeout elapsed                    */
+  WATCH_EVT_BLE_CONNECTED,    /**< BLE link established                          */
   WATCH_EVT_BLE_TIME_SYNCED,  /**< CTS write received and validated  */
   WATCH_EVT_BLE_DISCONNECTED, /**< BLE link lost or timed out */
-  WATCH_EVT_TICK,        /**< Periodic 1-minute tick (from RTC or soft timer)*/
-  WATCH_EVT_LOW_BATTERY, /**< Fuel gauge threshold crossed                  */
-  WATCH_EVT_BATTERY_OK,  /**< Battery level recovered (charging)            */
-  WATCH_EVT_SYNC_REQUESTED, /**< User or system requests a BLE sync */
+  WATCH_EVT_TICK,             /**< Periodic 1-minute tick (from RTC or soft timer)*/
+  WATCH_EVT_LOW_BATTERY,      /**< Fuel gauge threshold crossed                  */
+  WATCH_EVT_BATTERY_OK,       /**< Battery level recovered (charging)            */
+  WATCH_EVT_SYNC_REQUESTED,   /**< User or system requests a BLE sync */
 
   WATCH_EVT_COUNT,
 } watch_event_t;
@@ -73,7 +72,7 @@ typedef enum {
   WATCH_BOOT_COLD = 0,    /**< Power-on or hard reset                        */
   WATCH_BOOT_WRIST_RAISE, /**< GPIO sense wakeup from LIS3DH INT1            */
   WATCH_BOOT_RTC_ALARM,   /**< RTC alarm wakeup (PCF8563 or MCU RTC)         */
-  WATCH_BOOT_WATCHDOG, /**< Watchdog reset — log and treat as cold        */
+  WATCH_BOOT_WATCHDOG,    /**< Watchdog reset — log and treat as cold        */
 } watch_boot_reason_t;
 
 /* ── Hardware interface ─────────────────────────────────────────────────────

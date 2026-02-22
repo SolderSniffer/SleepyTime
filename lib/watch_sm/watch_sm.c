@@ -97,8 +97,7 @@ void watch_sm_on_boot(watch_sm_t *sm, watch_boot_reason_t reason,
     sm->time = *restored_time;
   } else {
     sm->time = k_default_time;
-    sm->iface->log(
-        "watch_sm: cold boot — no valid restored time, using default");
+    sm->iface->log("watch_sm: cold boot — no valid restored time, using default");
   }
 
   sm->iface->log("watch_sm: boot reason=%s time=%04u-%02u-%02u %02u:%02u",
@@ -106,8 +105,7 @@ void watch_sm_on_boot(watch_sm_t *sm, watch_boot_reason_t reason,
                  : (reason == WATCH_BOOT_RTC_ALARM) ? "RTC_ALARM"
                  : (reason == WATCH_BOOT_WATCHDOG)  ? "WATCHDOG"
                                                     : "COLD",
-                 sm->time.year, sm->time.month, sm->time.day, sm->time.hour,
-                 sm->time.minute);
+                 sm->time.year, sm->time.month, sm->time.day, sm->time.hour, sm->time.minute);
 
   watch_sm_event(sm, WATCH_EVT_BOOT_DONE);
 }
@@ -121,8 +119,7 @@ void watch_sm_event(watch_sm_t *sm, watch_event_t event) {
     return;
   }
 
-  sm->iface->log("watch_sm: [%s] + %s", watch_sm_state_name(sm->state),
-                 watch_sm_event_name(event));
+  sm->iface->log("watch_sm: [%s] + %s", watch_sm_state_name(sm->state), watch_sm_event_name(event));
 
   switch (sm->state) {
   case WATCH_STATE_BOOTING:
@@ -161,9 +158,8 @@ void watch_sm_on_time_sync(watch_sm_t *sm, const watch_time_t *new_time) {
   watch_sync_result_t result = watch_time_apply_sync(&sm->time, new_time);
 
   if (result == WATCH_SYNC_OK) {
-    sm->iface->log("watch_sm: time sync accepted %04u-%02u-%02u %02u:%02u:%02u",
-                   sm->time.year, sm->time.month, sm->time.day, sm->time.hour,
-                   sm->time.minute, sm->time.second);
+    sm->iface->log("watch_sm: time sync accepted %04u-%02u-%02u %02u:%02u:%02u", sm->time.year,
+                   sm->time.month, sm->time.day, sm->time.hour, sm->time.minute, sm->time.second);
     watch_sm_event(sm, WATCH_EVT_BLE_TIME_SYNCED);
   } else {
     sm->iface->log("watch_sm: time sync rejected (result=%d)", (int)result);
