@@ -45,8 +45,7 @@ static bool g_initialised;
 /* ── Public API ─────────────────────────────────────────────────────────────
  */
 
-void power_service_init(const wakeup_timer_iface_t *wakeup,
-                        const motion_iface_t *motion) {
+void power_service_init(const wakeup_timer_iface_t *wakeup, const motion_iface_t *motion) {
   __ASSERT_NO_MSG(wakeup != NULL);
   __ASSERT_NO_MSG(wakeup->arm != NULL);
   __ASSERT_NO_MSG(wakeup->disarm != NULL);

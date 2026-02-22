@@ -8,6 +8,10 @@ project(sleepytime VERSION 0.1.0)
 # ── Include paths ─────────────────────────────────────────────────────────────
 target_include_directories(app PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/services
+    ${CMAKE_CURRENT_SOURCE_DIR}/backends/motion
+    ${CMAKE_CURRENT_SOURCE_DIR}/backends/wakeup
     ${CMAKE_CURRENT_SOURCE_DIR}/../lib/watch_time
     ${CMAKE_CURRENT_SOURCE_DIR}/../lib/epd_canvas
     ${CMAKE_CURRENT_SOURCE_DIR}/../lib/watch_sm
@@ -16,18 +20,19 @@ target_include_directories(app PRIVATE
 # ── Sources ───────────────────────────────────────────────────────────────────
 target_sources(app PRIVATE
     # Entry point and wiring
-    main.c
+    core/main.c
 
     # Services
-    display_service.c
-    time_service.c
-    power_service.c
-    ble_service.c
-    motion_service.c
+    services/display_service.c
+    services/time_service.c
+    services/power_service.c
+    services/ble_service.c
 
-    # Wakeup timer implementations
-    # Swap wakeup_grtc.c for wakeup_pcf8563.c here to change timer source.
-    wakeup_grtc.c
+    # Hardware backends
+    backends/motion/lis3dh_service.c
+    backends/motion/bmi270_service.c
+    backends/wakeup/wakeup_grtc.c
+    backends/wakeup/wakeup_pcf8563.c
 
     # Lib sources compiled directly into the app target so the Zephyr
     # build system applies the ARM toolchain. See lib/*/CMakeLists.txt

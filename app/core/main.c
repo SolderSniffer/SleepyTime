@@ -10,8 +10,10 @@
  *   4. Pump events from the ISR/service queue to the state machine.
  *
  * Wiring rules:
- *   - To swap the wakeup timer (GRTC → PCF8563): change k_wakeup_iface.
- *   - To swap the motion sensor (LIS3DH → BMI270): change k_motion_iface.
+ *   - To swap wakeup backend (GRTC ↔ PCF8563): set one of
+ *     CONFIG_SLEEPYTIME_WAKEUP_BACKEND_* in Kconfig/prj.conf.
+ *   - To swap accelerometer backend (LIS3DH ↔ BMI270): set one of
+ *     CONFIG_SLEEPYTIME_MOTION_BACKEND_* in Kconfig/prj.conf.
  *   - No other file needs to change.
  *
  * No business logic lives here. If you find yourself adding conditionals
@@ -29,10 +31,23 @@
 /* Service headers */
 #include "ble_service.h"
 #include "display_service.h"
-#include "motion_service.h"
 #include "power_service.h"
 #include "time_service.h"
+#if defined(CONFIG_SLEEPYTIME_MOTION_BACKEND_LIS3DH)
+#include "lis3dh_service.h"
+#elif defined(CONFIG_SLEEPYTIME_MOTION_BACKEND_BMI270)
+#include "bmi270_service.h"
+#else
+#error "No accelerometer backend selected"
+#endif
+
+#if defined(CONFIG_SLEEPYTIME_WAKEUP_BACKEND_GRTC)
 #include "wakeup_grtc.h"
+#elif defined(CONFIG_SLEEPYTIME_WAKEUP_BACKEND_PCF8563)
+#include "wakeup_pcf8563.h"
+#else
+#error "No wakeup backend selected"
+#endif
 
 /* Pure-logic library headers */
 #include "watch_sm.h"
@@ -45,12 +60,37 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
 
 #define EVENT_QUEUE_DEPTH 8
 
-K_MSGQ_DEFINE(g_event_queue, sizeof(watch_event_t), EVENT_QUEUE_DEPTH,
-              sizeof(watch_event_t));
+K_MSGQ_DEFINE(g_event_queue, sizeof(watch_event_t), EVENT_QUEUE_DEPTH, sizeof(watch_event_t));
 
 /* ── Global state machine instance ───────────────────────────────────────── */
 
 static watch_sm_t g_sm;
+
+/* ── Backend selection helpers ───────────────────────────────────────────── */
+
+static const wakeup_timer_iface_t *selected_wakeup_iface(void) {
+#if defined(CONFIG_SLEEPYTIME_WAKEUP_BACKEND_GRTC)
+  return wakeup_grtc_iface();
+#elif defined(CONFIG_SLEEPYTIME_WAKEUP_BACKEND_PCF8563)
+  return wakeup_pcf8563_iface();
+#endif
+}
+
+static void selected_motion_init(void) {
+#if defined(CONFIG_SLEEPYTIME_MOTION_BACKEND_LIS3DH)
+  lis3dh_service_init();
+#elif defined(CONFIG_SLEEPYTIME_MOTION_BACKEND_BMI270)
+  bmi270_service_init();
+#endif
+}
+
+static const motion_iface_t *selected_motion_iface(void) {
+#if defined(CONFIG_SLEEPYTIME_MOTION_BACKEND_LIS3DH)
+  return lis3dh_service_iface();
+#elif defined(CONFIG_SLEEPYTIME_MOTION_BACKEND_BMI270)
+  return bmi270_service_iface();
+#endif
+}
 
 /* ── Event posting ──────────────────────────────────────────────────────────
  */
@@ -67,24 +107,18 @@ static void iface_display_time(const watch_time_t *t, uint8_t battery_pct) {
   display_service_show_watch_face(t, battery_pct);
 }
 
-static void iface_display_sync_screen(void) {
-  display_service_show_sync_screen();
-}
+static void iface_display_sync_screen(void) { display_service_show_sync_screen(); }
 
 static void iface_display_low_battery(uint8_t battery_pct) {
   display_service_show_low_battery(battery_pct);
 }
 
-static uint8_t iface_get_battery_pct(void) {
-  return power_service_battery_pct();
-}
+static uint8_t iface_get_battery_pct(void) { return power_service_battery_pct(); }
 
 static void iface_ble_start(void) { ble_service_start(); }
 static void iface_ble_stop(void) { ble_service_stop(); }
 
-static void iface_save_boot_state(const watch_time_t *t) {
-  time_service_save_boot_state(t);
-}
+static void iface_save_boot_state(const watch_time_t *t) { time_service_save_boot_state(t); }
 
 static void iface_enter_sleep(void) {
   power_service_enter_system_off();
@@ -171,19 +205,9 @@ int main(void) {
   /* 1. Decode reset reason before any service init disturbs the register */
   watch_boot_reason_t boot_reason = decode_reset_reason();
 
-  /* 2. Initialise services
-   *
-   * Wiring: swap wakeup timer or motion sensor here by changing which
-   * iface() function is passed to power_service_init().
-   *
-   *   GRTC wakeup:    wakeup_grtc_iface()      ← current
-   *   PCF8563 wakeup: wakeup_pcf8563_iface()   ← future alternative
-   *
-   *   LIS3DH motion:  motion_service_iface()   ← current
-   *   BMI270 motion:  bmi270_service_iface()   ← future alternative
-   */
-  motion_service_init();
-  power_service_init(wakeup_grtc_iface(), motion_service_iface());
+  /* 2. Initialise services using selected hardware backends */
+  selected_motion_init();
+  power_service_init(selected_wakeup_iface(), selected_motion_iface());
 
   display_service_init();
   time_service_init();

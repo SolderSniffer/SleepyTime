@@ -16,8 +16,7 @@
 #include <stdint.h>
 
 void display_service_init(void);
-void display_service_show_watch_face(const watch_time_t *t,
-                                     uint8_t battery_pct);
+void display_service_show_watch_face(const watch_time_t *t, uint8_t battery_pct);
 void display_service_show_sync_screen(void);
 void display_service_show_low_battery(uint8_t battery_pct);
 

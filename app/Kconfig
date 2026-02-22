@@ -1,0 +1,29 @@
+source "Kconfig.zephyr"
+
+menu "SleepyTime"
+
+choice SLEEPYTIME_WAKEUP_BACKEND
+    prompt "SleepyTime wakeup timer backend"
+    default SLEEPYTIME_WAKEUP_BACKEND_GRTC
+
+config SLEEPYTIME_WAKEUP_BACKEND_GRTC
+    bool "nRF GRTC"
+
+config SLEEPYTIME_WAKEUP_BACKEND_PCF8563
+    bool "PCF8563 RTC"
+
+endchoice
+
+choice SLEEPYTIME_MOTION_BACKEND
+    prompt "SleepyTime accelerometer backend"
+    default SLEEPYTIME_MOTION_BACKEND_LIS3DH
+
+config SLEEPYTIME_MOTION_BACKEND_LIS3DH
+    bool "LIS3DH"
+
+config SLEEPYTIME_MOTION_BACKEND_BMI270
+    bool "BMI270"
+
+endchoice
+
+endmenu

@@ -12,7 +12,7 @@
  *                           Swap by changing one pointer in main.c.
  *
  *   motion_iface_t        — configure accelerometer GPIO sense wakeup.
- *                           Default impl: motion_service.c (LIS3DH).
+ *                           Default impl: lis3dh_service.c (LIS3DH).
  *                           Swap by changing one pointer in main.c.
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -21,7 +21,7 @@
 #ifndef POWER_SERVICE_H
 #define POWER_SERVICE_H
 
-#include "motion_service.h"
+#include "lis3dh_service.h"
 #include "watch_sm.h"
 #include <stdint.h>
 
@@ -60,14 +60,13 @@ typedef struct {
  *
  * @wakeup: wakeup timer interface (e.g. wakeup_grtc_iface()). Must not
  *          be NULL.
- * @motion: motion/accelerometer interface (e.g. motion_service_iface()).
+ * @motion: motion/accelerometer interface (e.g. lis3dh_service_iface()).
  *          May be NULL — GRTC-only wakeup will be used.
  *
  * Stores both interface pointers for use by power_service_enter_system_off().
  * Does not arm either wakeup source — that is deferred to sleep entry.
  */
-void power_service_init(const wakeup_timer_iface_t *wakeup,
-                        const motion_iface_t *motion);
+void power_service_init(const wakeup_timer_iface_t *wakeup, const motion_iface_t *motion);
 
 /**
  * power_service_battery_pct() - return battery level 0–100.
