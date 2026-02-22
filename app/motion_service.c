@@ -47,7 +47,8 @@ LOG_MODULE_REGISTER(motion_service, LOG_LEVEL_DBG);
  */
 #define WRIST_RAISE_DUR 2
 
-/* ── Device handle ────────────────────────────────────────────────────────── */
+/* ── Device handle ──────────────────────────────────────────────────────────
+ */
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(lis3dh), okay)
 static const struct device *const g_lis3dh =
@@ -59,11 +60,9 @@ static const struct device *const g_lis3dh =
 
 /* ── motion_iface_t implementation ───────────────────────────────────────── */
 
-static int lis3dh_configure_wakeup(void)
-{
+static int lis3dh_configure_wakeup(void) {
 #if LIS3DH_AVAILABLE
-  if (!device_is_ready(g_lis3dh))
-  {
+  if (!device_is_ready(g_lis3dh)) {
     LOG_ERR("LIS3DH device not ready");
     return -ENODEV;
   }
@@ -78,8 +77,7 @@ static int lis3dh_configure_wakeup(void)
   };
   int rc = sensor_attr_set(g_lis3dh, SENSOR_CHAN_ACCEL_XYZ,
                            SENSOR_ATTR_SLOPE_TH, &th);
-  if (rc < 0)
-  {
+  if (rc < 0) {
     LOG_ERR("Failed to set slope threshold (%d)", rc);
     return rc;
   }
@@ -89,10 +87,9 @@ static int lis3dh_configure_wakeup(void)
    * The driver writes this to INT1_DUR via SENSOR_ATTR_SLOPE_DUR.
    */
   struct sensor_value dur = {.val1 = WRIST_RAISE_DUR, .val2 = 0};
-  rc = sensor_attr_set(g_lis3dh, SENSOR_CHAN_ACCEL_XYZ,
-                       SENSOR_ATTR_SLOPE_DUR, &dur);
-  if (rc < 0)
-  {
+  rc = sensor_attr_set(g_lis3dh, SENSOR_CHAN_ACCEL_XYZ, SENSOR_ATTR_SLOPE_DUR,
+                       &dur);
+  if (rc < 0) {
     LOG_ERR("Failed to set slope duration (%d)", rc);
     return rc;
   }
@@ -118,8 +115,7 @@ static int lis3dh_configure_wakeup(void)
       .chan = SENSOR_CHAN_ACCEL_XYZ,
   };
   rc = sensor_trigger_set(g_lis3dh, &trig, NULL);
-  if (rc < 0)
-  {
+  if (rc < 0) {
     LOG_ERR("Failed to set any-motion trigger (%d)", rc);
     return rc;
   }
@@ -137,8 +133,7 @@ static int lis3dh_configure_wakeup(void)
    * in suspend, which is exactly what we need for GPIO sense wakeup.
    */
   rc = pm_device_action_run(g_lis3dh, PM_DEVICE_ACTION_SUSPEND);
-  if (rc < 0 && rc != -ENOSYS && rc != -EALREADY)
-  {
+  if (rc < 0 && rc != -ENOSYS && rc != -EALREADY) {
     LOG_WRN("LIS3DH PM suspend failed (%d) — continuing", rc);
   }
 
@@ -151,11 +146,9 @@ static int lis3dh_configure_wakeup(void)
 #endif
 }
 
-static int lis3dh_clear(void)
-{
+static int lis3dh_clear(void) {
 #if LIS3DH_AVAILABLE
-  if (!device_is_ready(g_lis3dh))
-  {
+  if (!device_is_ready(g_lis3dh)) {
     return -ENODEV;
   }
 
@@ -164,8 +157,7 @@ static int lis3dh_clear(void)
    * The sensor was suspended in configure_wakeup() before System Off.
    */
   int rc = pm_device_action_run(g_lis3dh, PM_DEVICE_ACTION_RESUME);
-  if (rc < 0 && rc != -ENOSYS && rc != -EALREADY)
-  {
+  if (rc < 0 && rc != -ENOSYS && rc != -EALREADY) {
     LOG_WRN("LIS3DH PM resume failed (%d)", rc);
   }
 
@@ -180,13 +172,9 @@ static int lis3dh_clear(void)
    * trigger that path without a live interrupt handler.
    */
   rc = sensor_sample_fetch(g_lis3dh);
-  if (rc < 0)
-  {
-    LOG_WRN("sensor_sample_fetch failed (%d) — INT1 latch may persist",
-            rc);
-  }
-  else
-  {
+  if (rc < 0) {
+    LOG_WRN("sensor_sample_fetch failed (%d) — INT1 latch may persist", rc);
+  } else {
     LOG_DBG("LIS3DH INT1 latch cleared");
   }
 #endif
@@ -198,24 +186,21 @@ static const motion_iface_t k_lis3dh_iface = {
     .clear = lis3dh_clear,
 };
 
-/* ── Service API ──────────────────────────────────────────────────────────── */
+/* ── Service API ────────────────────────────────────────────────────────────
+ */
 
-void motion_service_init(void)
-{
+void motion_service_init(void) {
 #if LIS3DH_AVAILABLE
-  if (!device_is_ready(g_lis3dh))
-  {
+  if (!device_is_ready(g_lis3dh)) {
     LOG_ERR("LIS3DH not ready — check I2C wiring and overlay address");
     return;
   }
   LOG_INF("motion_service: LIS3DH ready");
 #else
-  LOG_WRN("motion_service: lis3dh node not in DTS — wrist-raise wakeup disabled");
+  LOG_WRN(
+      "motion_service: lis3dh node not in DTS — wrist-raise wakeup disabled");
   LOG_WRN("Add st,lis3dh node to app/boards/*.overlay");
 #endif
 }
 
-const motion_iface_t *motion_service_iface(void)
-{
-  return &k_lis3dh_iface;
-}
+const motion_iface_t *motion_service_iface(void) { return &k_lis3dh_iface; }
