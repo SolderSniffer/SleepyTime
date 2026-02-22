@@ -29,8 +29,19 @@ SHELL        := /bin/bash
 .SHELLFLAGS  := -euo pipefail -c
 .DEFAULT_GOAL := help
 
-# ── Board / SoC target (nRF54L15 DK) ─────────────────────────────────────────
+# ── Board / SoC target ───────────────────────────────────────────────────────
+# The upstream XIAO board is the base. Hardware-specific pin assignments
+# live in the overlay file, not here.
 BOARD        ?= xiao_nrf54l15/nrf54l15/cpuapp
+
+# ── DTS overlay ───────────────────────────────────────────────────────────────
+# Selects which hardware configuration to build for:
+#   sleepytime_proto.overlay  — prototype with discrete modules (default)
+#   sleepytime_v1.overlay     — first custom PCB spin (future)
+#
+# Override at the command line:
+#   make build-debug OVERLAY=app/boards/sleepytime_v1.overlay
+OVERLAY      ?= app/boards/sleepytime_proto.overlay
 
 # ── Build output directories ──────────────────────────────────────────────────
 BUILD_DEBUG   := build/debug
@@ -88,6 +99,7 @@ build-debug:
 	    --pristine=auto \
 	    app \
 	    -- \
+	    -DDTC_OVERLAY_FILE=$(CURDIR)/$(OVERLAY) \
 	    -DCONFIG_DEBUG=y \
 	    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 	@echo "$(GREEN)✓ Debug build complete:$(RESET) $(BUILD_DEBUG)/zephyr/zephyr.hex"
@@ -102,6 +114,7 @@ build-release:
 	    --pristine=auto \
 	    app \
 	    -- \
+	    -DDTC_OVERLAY_FILE=$(CURDIR)/$(OVERLAY) \
 	    -DCONFIG_SIZE_OPTIMIZATIONS=y \
 	    -DCONFIG_ASSERT=n \
 	    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -222,6 +235,7 @@ help:
 	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## //' | \
 	    awk -F': ' '{ printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2 }'
 	@echo ""
-	@echo "$(YELLOW)Override BOARD to target a different variant:$(RESET)"
-	@echo "  make build-debug BOARD=xiao_nrf54l15/nrf54l15/cpuapp"
+	@echo "$(YELLOW)Override BOARD or OVERLAY for different hardware:$(RESET)"
+	@echo "  make build-debug OVERLAY=app/boards/sleepytime_v1.overlay"
+	@echo "  make build-debug BOARD=other_board/variant OVERLAY=app/boards/other.overlay"
 	@echo ""
