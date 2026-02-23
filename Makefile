@@ -13,6 +13,9 @@
 #   make shell          — drop into the hermetic dev container (interactive)
 #   make build-debug    — build firmware with debug configuration
 #   make build-release  — build firmware with release/optimised configuration
+#   make samples        — list available standalone sample apps
+#   make build-sample SAMPLE=blink
+#   make flash-sample SAMPLE=blink
 #   make format         — auto-format all C sources in-place
 #   make lint           — check formatting + run clang-tidy (CI gate)
 #   make test           — compile and run host-side unit tests
@@ -47,6 +50,11 @@ OVERLAY      ?= app/boards/sleepytime_proto.overlay
 BUILD_DEBUG   := build/debug
 BUILD_RELEASE := build/release
 BUILD_TEST    := build/test
+
+# ── Standalone sample app defaults ───────────────────────────────────────────
+SAMPLE       ?= blink
+SAMPLE_DIR   := samples/$(SAMPLE)
+BUILD_SAMPLE := build/samples/$(SAMPLE)
 
 # ── Source directories scanned by lint/format targets ─────────────────────────
 SRC_DIRS     := app drivers lib
@@ -119,6 +127,42 @@ build-release:
 	    -DCONFIG_ASSERT=n \
 	    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 	@echo "$(GREEN)✓ Release build complete:$(RESET) $(BUILD_RELEASE)/zephyr/zephyr.hex"
+
+# =============================================================================
+# SAMPLE TARGETS
+# =============================================================================
+
+.PHONY: samples
+## samples: List available standalone sample apps under samples/
+samples:
+	@echo "$(BOLD)Available samples:$(RESET)"
+	@if [ -d samples ]; then \
+	    find samples -mindepth 1 -maxdepth 1 -type d -printf "  - %f\n" | sort; \
+	else \
+	    echo "  (none)"; \
+	fi
+
+.PHONY: build-sample
+## build-sample: Build a sample (make build-sample SAMPLE=blink)
+build-sample:
+	@if [ ! -d "$(SAMPLE_DIR)" ]; then \
+	    echo "$(YELLOW)Sample not found: $(SAMPLE_DIR)$(RESET)"; \
+	    echo "Run 'make samples' to list valid values."; \
+	    exit 2; \
+	fi
+	@echo "$(BOLD)$(GREEN)[build-sample]$(RESET) Building sample '$(SAMPLE)' for $(BOARD)…"
+	west build \
+	    --board $(BOARD) \
+	    --build-dir $(BUILD_SAMPLE) \
+	    --pristine=auto \
+	    --source-dir $(SAMPLE_DIR)
+	@echo "$(GREEN)✓ Sample build complete:$(RESET) $(BUILD_SAMPLE)/zephyr/zephyr.hex"
+
+.PHONY: flash-sample
+## flash-sample: Flash a sample (make flash-sample SAMPLE=blink)
+flash-sample: build-sample debug-cleanup
+	@echo "$(CYAN)[flash-sample]$(RESET) Flashing sample '$(SAMPLE)'…"
+	west flash --build-dir $(BUILD_SAMPLE)
 
 # =============================================================================
 # LINT / FORMAT TARGETS
