@@ -42,31 +42,7 @@ make flash
 Press `F5` in VS Code to start a debug session. The firmware is flashed and execution halts at `main`. You can set breakpoints, step through code, and inspect variables as normal. The debug configuration uses OpenOCD with hardware breakpoints to work around the nRF54L15's SPU restrictions.
 
 ### 6. View RTT logs
-In a second terminal inside the container, start OpenOCD with the RTT server:
-```bash
-/opt/zephyr-sdk/sysroots/x86_64-pokysdk-linux/usr/bin/openocd \
-    -s /opt/ncs/zephyr/boards/seeed/xiao_nrf54l15/support \
-    -s /opt/zephyr-sdk/sysroots/x86_64-pokysdk-linux/usr/share/openocd/scripts \
-    -f /opt/ncs/zephyr/boards/seeed/xiao_nrf54l15/support/openocd.cfg \
-    -c "init" \
-    -c "rtt setup 0x20000000 0x50000 \"SEGGER RTT\"" \
-    -c "rtt start" \
-    -c "rtt server start 5555 0"
-```
-Then in a third terminal connect to the RTT stream:
-```bash
-python3 -c "
-import socket, sys
-s = socket.socket()
-s.connect(('localhost', 5555))
-while True:
-    data = s.recv(1024)
-    if not data: break
-    sys.stdout.write(data.decode('utf-8', errors='replace'))
-    sys.stdout.flush()
-"
-```
-TODO: Add a `make rtt` target that runs both commands in tmux or implement something like rust's defmt.
+Flash the firmware with `make flash`, then in VS Code open the **Run and Debug** sidebar (`Ctrl+Shift+D`) and click the **Attach and RTT (OpenOCD)** launch configuration. This will connect to the device's RTT output and display log messages in a new terminal panel. In the hovering menu, click the **Reset device** button to reset the device and start streaming logs from the beginning of `main()`.
 
 ### 7. Run lint
 ```bash

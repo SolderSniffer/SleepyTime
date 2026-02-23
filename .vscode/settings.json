@@ -1,4 +1,5 @@
 {
+  "cortex-debug.gdbPath": "/opt/zephyr-sdk/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb",
   "editor.formatOnSave": true,
   "[c]": {
     "editor.defaultFormatter": "ms-vscode.cpptools"
