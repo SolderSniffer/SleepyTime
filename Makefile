@@ -160,7 +160,7 @@ build-sample:
 
 .PHONY: flash-sample
 ## flash-sample: Flash a sample (make flash-sample SAMPLE=blink)
-flash-sample: build-sample debug-cleanup
+flash-sample: build-sample
 	@echo "$(CYAN)[flash-sample]$(RESET) Flashing sample '$(SAMPLE)'…"
 	west flash --build-dir $(BUILD_SAMPLE)
 
