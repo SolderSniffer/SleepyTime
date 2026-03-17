@@ -41,14 +41,11 @@ Can I use the CMSIS-DAP for debugging? Yes, and the project is configured to sup
 
 The toys are there, so you can use them if you want! Just be aware of the potential impact on power management.
 
-### 5. Run lint
+### 5. Run linter and formatter
 ```bash
 make lint             # format-check + clang-tidy (CI gate)
 make format           # auto-format sources in-place
 ```
-
-Formatting is standardised across CLI and editor:
-- `make format` / `make lint` use project `.clang-format`
 
 ### 6. Run unit tests
 ```bash
